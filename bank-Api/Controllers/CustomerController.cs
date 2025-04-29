@@ -18,6 +18,7 @@ namespace bank_Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Customer>> RegisterCustomer(Customer customer)
         {
+            customer.AvailableBalance = 2500m;
             _context.Customers.Add(customer);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetCustomer), new { id = customer.Id }, customer);

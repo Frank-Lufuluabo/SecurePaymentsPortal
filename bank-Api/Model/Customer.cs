@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace bank_Api.Model
@@ -8,7 +9,7 @@ namespace bank_Api.Model
         public int Id { get; set; }
         
         [Required]
-        public string Name { get; set; }
+        public string FullName { get; set; }
 
         [Required]
         public string AccountNumber { get; set; }
@@ -20,5 +21,10 @@ namespace bank_Api.Model
 
         [Required]
         public string UserName { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+        public bool IsAuthenticated { get; set; }
+        public decimal AvailableBalance { get;  set; }
     }
 }
