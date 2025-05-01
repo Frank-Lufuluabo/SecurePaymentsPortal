@@ -58,7 +58,6 @@ namespace bank_Api.Controllers
             _context.Update(transaction);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetStaffTransactions), new {}, transaction);
-
         }
     }
 }

@@ -1,15 +1,12 @@
-using bank_Api.Data; // <-- Adjust this to your actual namespace
+using bank_Api.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-// ? Add ApplicationDbContext and SQL Server connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ? Add CORS (optional, but common)
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
