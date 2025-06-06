@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace bank_Api.Model
 {
@@ -23,6 +24,7 @@ namespace bank_Api.Model
         public string UserName { get; set; }
 
         [Required]
+        [NotMapped]
         public string Password { get; set; }
         public bool IsAuthenticated { get; set; }
         public decimal AvailableBalance { get;  set; }
