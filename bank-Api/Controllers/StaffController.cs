@@ -9,6 +9,7 @@ namespace bank_Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("[controller]")]
+[Authorize(Roles = "Staff")]
 public class StaffController(ApplicationDbContext context) : ControllerBase
 {
     [HttpGet]

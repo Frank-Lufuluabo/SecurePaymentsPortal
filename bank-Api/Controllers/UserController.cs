@@ -56,7 +56,7 @@ public class UserController(IConfiguration configuration, ApplicationDbContext c
         );
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    
+
     // Get Current User by EmployeeId
     [HttpGet("current-user/{employeeId}")]
     public async Task<ActionResult<User>> GetCurrentUser(string employeeId)

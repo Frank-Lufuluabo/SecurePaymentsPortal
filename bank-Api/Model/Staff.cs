@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using bank_Api.IdentityAuth;
 
 namespace bank_Api.Model
 {
-    public class Staff
+    public class Staff : ApplicationUser
     {
         public int Id { get; set; }
 

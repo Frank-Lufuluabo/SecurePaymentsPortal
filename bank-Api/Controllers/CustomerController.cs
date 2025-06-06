@@ -1,14 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using bank_Api.Data;
 using bank_Api.Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace bank_Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize(Roles = "Staff")]
 public class CustomerController(ApplicationDbContext context) : ControllerBase
 {
     [HttpPost]
+    [Authorize(Roles = "Staff")]
     public async Task<ActionResult<Customer>> RegisterCustomer(Customer customer)
     {
         customer.AvailableBalance = 2500m;
