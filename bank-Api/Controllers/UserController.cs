@@ -1,13 +1,17 @@
-﻿using bank_Api.Data;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using bank_Api.Data;
 using bank_Api.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace bank_Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UserController(ApplicationDbContext context) : ControllerBase
+public class UserController(IConfiguration configuration, ApplicationDbContext context) : ControllerBase
 {
     // Staff Login
     [HttpPost("login")]
@@ -26,10 +30,33 @@ public class UserController(ApplicationDbContext context) : ControllerBase
 
         user.IsAuthenticated = true;
         await context.SaveChangesAsync();
-
-        return Ok(user);
+        
+        // Generate JWT token
+        var token = GenerateJwtToken(user.UserName);
+        return Ok(new { User=user, Token = token });
     }
 
+    private string GenerateJwtToken(string username)
+    {
+        var jwtSettings = configuration.GetSection("JwtSettings");
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Name, username)
+        };
+        var token = new JwtSecurityToken(
+            issuer: jwtSettings["Issuer"],
+            audience: jwtSettings["Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpiresInMinutes"])),
+            signingCredentials: credentials
+        );
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+    
     // Get Current User by EmployeeId
     [HttpGet("current-user/{employeeId}")]
     public async Task<ActionResult<User>> GetCurrentUser(string employeeId)
@@ -87,7 +114,9 @@ public class UserController(ApplicationDbContext context) : ControllerBase
         customer.IsAuthenticated = true;
         await context.SaveChangesAsync();
 
-        return Ok(customer);
+        var token = GenerateJwtToken(customer.UserName);
+
+        return Ok(new { User = customer, Token = token });
     }
 
     // Customer Logout
