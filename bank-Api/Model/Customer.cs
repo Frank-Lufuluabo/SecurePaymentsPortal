@@ -1,11 +1,10 @@
-using System;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using bank_Api.IdentityAuth;
 
 namespace bank_Api.Model
 {
-    public class Customer
+    public class Customer : ApplicationUser
     {
         public int Id { get; set; }
         

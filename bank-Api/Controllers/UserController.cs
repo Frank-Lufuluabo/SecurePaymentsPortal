@@ -1,145 +1,159 @@
-﻿using bank_Api.Data;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using bank_Api.Data;
 using bank_Api.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
-namespace bank_Api.Controllers
+namespace bank_Api.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class UserController(IConfiguration configuration, ApplicationDbContext context) : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class UserController : ControllerBase
+    // Staff Login
+    [HttpPost("login")]
+    public async Task<ActionResult<User>> Login([FromBody] User request)
     {
-        private readonly ApplicationDbContext _context;
-
-        public UserController(ApplicationDbContext context)
+        if (string.IsNullOrWhiteSpace(request.EmployeeId) || string.IsNullOrWhiteSpace(request.Password))
         {
-            _context = context;
+            return BadRequest(new { message = "Employee ID and Password are required." });
         }
 
-        // Staff Login
-        [HttpPost("login")]
-        public async Task<ActionResult<User>> Login([FromBody] User request)
+        var user = await context.Users.FirstOrDefaultAsync(u => u.EmployeeId == request.EmployeeId);
+        if (user == null || user.Password != request.Password)
         {
-            if (string.IsNullOrWhiteSpace(request.EmployeeId) || string.IsNullOrWhiteSpace(request.Password))
-            {
-                return BadRequest(new { message = "Employee ID and Password are required." });
-            }
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.EmployeeId == request.EmployeeId);
-
-            if (user == null || user.Password != request.Password)
-            {
-                return Unauthorized(new { message = "Invalid Employee ID or Password." });
-            }
-
-            user.IsAuthenticated = true;
-            await _context.SaveChangesAsync();
-
-            return Ok(user);
+            return Unauthorized(new { message = "Invalid Employee ID or Password." });
         }
 
-        // Get Current User by EmployeeId
-        [HttpGet("current-user/{employeeId}")]
-        public async Task<ActionResult<User>> GetCurrentUser(string employeeId)
+        user.IsAuthenticated = true;
+        await context.SaveChangesAsync();
+        
+        // Generate JWT token
+        var token = GenerateJwtToken(user.UserName);
+        return Ok(new { User=user, Token = token });
+    }
+
+    private string GenerateJwtToken(string username)
+    {
+        var jwtSettings = configuration.GetSection("JwtSettings");
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var claims = new[]
         {
-            if (string.IsNullOrWhiteSpace(employeeId))
-            {
-                return BadRequest(new { message = "Employee ID is required." });
-            }
+            new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Name, username)
+        };
+        var token = new JwtSecurityToken(
+            issuer: jwtSettings["Issuer"],
+            audience: jwtSettings["Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(double.Parse(jwtSettings["ExpiresInMinutes"])),
+            signingCredentials: credentials
+        );
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.EmployeeId == employeeId);
-
-            if (user == null)
-            {
-                return NotFound(new { message = "User not found." });
-            }
-
-            return Ok(user);
+    // Get Current User by EmployeeId
+    [HttpGet("current-user/{employeeId}")]
+    public async Task<ActionResult<User>> GetCurrentUser(string employeeId)
+    {
+        if (string.IsNullOrWhiteSpace(employeeId))
+        {
+            return BadRequest(new { message = "Employee ID is required." });
         }
 
-        // Staff Logout
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout([FromBody] string employeeId)
+        var user = await context.Users.FirstOrDefaultAsync(u => u.EmployeeId == employeeId);
+        if (user == null)
         {
-            if (string.IsNullOrWhiteSpace(employeeId))
-            {
-                return BadRequest(new { message = "Employee ID is required." });
-            }
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.EmployeeId == employeeId);
-
-            if (user == null)
-            {
-                return NotFound(new { message = "User not found." });
-            }
-
-            user.IsAuthenticated = false;
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Logged out successfully." });
+            return NotFound(new { message = "User not found." });
         }
 
-        // Customer Login
-        [HttpPost("customer-login")]
-        public async Task<ActionResult<Customer>> CustomerLogin([FromBody] Customer request)
+        return Ok(user);
+    }
+
+    // Staff Logout
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout([FromBody] string employeeId)
+    {
+        if (string.IsNullOrWhiteSpace(employeeId))
         {
-            if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password) || string.IsNullOrWhiteSpace(request.AccountNumber)) 
-            {
-                return BadRequest(new { message = "Customer username, account number and Password are required." });
-            }
-
-            var customer = await _context.Customers.FirstOrDefaultAsync(u => u.UserName == request.UserName && 
-                                                                     u.AccountNumber == request.AccountNumber);
-
-            if (customer == null || customer.Password != request.Password)
-            {
-                return Unauthorized(new { message = "Invalid Username, account number or Password." });
-            }
-
-            customer.IsAuthenticated = true;
-            await _context.SaveChangesAsync();
-
-            return Ok(customer);
+            return BadRequest(new { message = "Employee ID is required." });
         }
 
-        // Customer Logout
-        [HttpPost("customer-logout")]
-        public async Task<IActionResult> CustomerLogout([FromBody] int customerId)
+        var user = await context.Users.FirstOrDefaultAsync(u => u.EmployeeId == employeeId);
+        if (user == null)
         {
-            if (customerId <= 0)
-            {
-                return BadRequest(new { message = "Customer Id is required." });
-            }
-
-            var user = await _context.Customers.FirstOrDefaultAsync(u => u.Id == customerId);
-
-            if (user == null)
-            {
-                return NotFound(new { message = "User not found." });
-            }
-
-            user.IsAuthenticated = false;
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Logged out successfully." });
+            return NotFound(new { message = "User not found." });
         }
 
-        [HttpGet("current-customer/{customerId}")]
-        public async Task<ActionResult<User>> GetCurrentCustomer(int customerId)
+        user.IsAuthenticated = false;
+        await context.SaveChangesAsync();
+
+        return Ok(new { message = "Logged out successfully." });
+    }
+
+    // Customer Login
+    [HttpPost("customer-login")]
+    public async Task<ActionResult<Customer>> CustomerLogin([FromBody] Customer request)
+    {
+        if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password) || string.IsNullOrWhiteSpace(request.AccountNumber)) 
         {
-            if (customerId <= 0)
-            {
-                return BadRequest(new { message = "Customer Id is required." });
-            }
-
-            var customer = await _context.Customers.FirstOrDefaultAsync(u => u.Id== customerId);
-
-            if (customer == null)
-            {
-                return NotFound(new { message = "Customer not found." });
-            }
-
-            return Ok(customer);
+            return BadRequest(new { message = "Customer username, account number and Password are required." });
         }
+
+        var customer = await context.Customers.FirstOrDefaultAsync(u => u.UserName == request.UserName && u.AccountNumber == request.AccountNumber);
+        if (customer == null || customer.Password != request.Password)
+        {
+            return Unauthorized(new { message = "Invalid Username, account number or Password." });
+        }
+
+        customer.IsAuthenticated = true;
+        await context.SaveChangesAsync();
+
+        var token = GenerateJwtToken(customer.UserName);
+
+        return Ok(new { User = customer, Token = token });
+    }
+
+    // Customer Logout
+    [HttpPost("customer-logout")]
+    public async Task<IActionResult> CustomerLogout([FromBody] int customerId)
+    {
+        if (customerId <= 0)
+        {
+            return BadRequest(new { message = "Customer Id is required." });
+        }
+
+        var user = await context.Customers.FirstOrDefaultAsync(u => u.Id == customerId);
+        if (user == null)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+
+        user.IsAuthenticated = false;
+        await context.SaveChangesAsync();
+
+        return Ok(new { message = "Logged out successfully." });
+    }
+
+    [HttpGet("current-customer/{customerId}")]
+    public async Task<ActionResult<User>> GetCurrentCustomer(int customerId)
+    {
+        if (customerId <= 0)
+        {
+            return BadRequest(new { message = "Customer Id is required." });
+        }
+
+        var customer = await context.Customers.FirstOrDefaultAsync(u => u.Id== customerId);
+        if (customer == null)
+        {
+            return NotFound(new { message = "Customer not found." });
+        }
+
+        return Ok(customer);
     }
 }
