@@ -1,6 +1,88 @@
 @bank_Api_HostAddress = http://localhost:5245
 
+### Get a customer by ID
 GET {{bank_Api_HostAddress}}/Customer/1
+Accept: application/json
+
+###
+
+### Get all customers
+GET {{bank_Api_HostAddress}}/Customer
+Accept: application/json
+
+###
+
+### Create a new customer
+POST {{bank_Api_HostAddress}}/Customer
+Content-Type: application/json
+
+{
+  "fullName": "Alice Smith",
+  "idNumber": "ID123456",
+  "availableBalance": 1000.00,
+  "employeeId": "emp003",
+  "password": "password123",
+  "name": "Alice Smith",
+  "role": "customer"
+}
+
+###
+
+### Update a customer
+PUT {{bank_Api_HostAddress}}/Customer/1
+Content-Type: application/json
+
+{
+  "fullName": "Alice Smith Updated",
+  "idNumber": "ID123456",
+  "availableBalance": 1200.00,
+  "employeeId": "emp003",
+  "password": "newpassword",
+  "name": "Alice Smith",
+  "role": "customer"
+}
+
+###
+
+### Delete a customer
+DELETE {{bank_Api_HostAddress}}/Customer/1
+
+###
+
+### Get all staff
+GET {{bank_Api_HostAddress}}/Staff
+Accept: application/json
+
+###
+
+### Create a new staff member
+POST {{bank_Api_HostAddress}}/Staff
+Content-Type: application/json
+
+{
+  "position": "Manager",
+  "email": "manager@bank.com",
+  "employeeId": "emp004",
+  "password": "password123",
+  "name": "John Manager",
+  "role": "staff"
+}
+
+###
+
+### User login (if implemented)
+POST {{bank_Api_HostAddress}}/User/login
+Content-Type: application/json
+
+{
+  "userName": "Alice Smith",
+  "password": "password123"
+}
+
+###
+
+### Get all users
+GET {{bank_Api_HostAddress}}/User
 Accept: application/json
 
 ###

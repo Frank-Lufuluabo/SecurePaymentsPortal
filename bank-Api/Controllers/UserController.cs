@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using bank_Api.Data;
+using bank_Api.IdentityAuth;
 using bank_Api.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,14 +16,14 @@ public class UserController(IConfiguration configuration, ApplicationDbContext c
 {
     // Staff Login
     [HttpPost("login")]
-    public async Task<ActionResult<User>> Login([FromBody] User request)
+    public async Task<ActionResult<User>> Login([FromBody] UserLogin request)
     {
-        if (string.IsNullOrWhiteSpace(request.EmployeeId) || string.IsNullOrWhiteSpace(request.Password))
+        if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password))
         {
             return BadRequest(new { message = "Employee ID and Password are required." });
         }
 
-        var user = await context.Users.FirstOrDefaultAsync(u => u.EmployeeId == request.EmployeeId);
+        var user = await context.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
         if (user == null || user.Password != request.Password)
         {
             return Unauthorized(new { message = "Invalid Employee ID or Password." });
@@ -47,6 +48,9 @@ public class UserController(IConfiguration configuration, ApplicationDbContext c
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(ClaimTypes.Name, username)
         };
+
+        //Add Roles
+
         var token = new JwtSecurityToken(
             issuer: jwtSettings["Issuer"],
             audience: jwtSettings["Audience"],
@@ -77,14 +81,14 @@ public class UserController(IConfiguration configuration, ApplicationDbContext c
 
     // Staff Logout
     [HttpPost("logout")]
-    public async Task<IActionResult> Logout([FromBody] string employeeId)
+    public async Task<IActionResult> Logout([FromBody] int employeeId)
     {
-        if (string.IsNullOrWhiteSpace(employeeId))
+        if (employeeId <= 0)
         {
             return BadRequest(new { message = "Employee ID is required." });
         }
 
-        var user = await context.Users.FirstOrDefaultAsync(u => u.EmployeeId == employeeId);
+        var user = await context.Staff.FirstOrDefaultAsync(u => u.Id == employeeId);
         if (user == null)
         {
             return NotFound(new { message = "User not found." });
@@ -98,7 +102,7 @@ public class UserController(IConfiguration configuration, ApplicationDbContext c
 
     // Customer Login
     [HttpPost("customer-login")]
-    public async Task<ActionResult<Customer>> CustomerLogin([FromBody] Customer request)
+    public async Task<ActionResult<Customer>> CustomerLogin([FromBody] CustomerLogin request)
     {
         if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password) || string.IsNullOrWhiteSpace(request.AccountNumber)) 
         {

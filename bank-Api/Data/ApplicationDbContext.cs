@@ -1,40 +1,74 @@
 using Microsoft.EntityFrameworkCore;
 using bank_Api.Model;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace bank_Api.Data
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
-        : DbContext(options)
+    public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options)
+        {
+        }
+
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Staff> Staff { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
-        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<User>().HasData(
-                new User
+            // Set decimal precision for Customer.AvailableBalance
+            modelBuilder.Entity<Customer>()
+                .Property(c => c.AvailableBalance)
+                .HasPrecision(18, 2);
+
+            // Set decimal precision for Transaction.Amount
+            modelBuilder.Entity<Transaction>()
+                .Property(t => t.Amount)
+                .HasPrecision(18, 2);
+
+            // Seed Staff
+            modelBuilder.Entity<Staff>().HasData(
+                new Staff
                 {
-                    UserId = 1,
+                    Id = 1,
                     EmployeeId = "emp001",
-                    Password = "password123", 
-                    Name = "Franck ",
+                    UserName = "franck",
+                    Password = "password",
+                    Name = "Franck",
                     Role = "employee",
-                    IsAuthenticated = false
-                },
-                new User
-                {
-                    UserId = 2,
-                    EmployeeId = "em002",
-                    Password = "password123",
-                    Name = "Bob",
-                    Role = "employee",
+                    Email = "employee@gmail.com",
+                    Position = "Bank Teller",
                     IsAuthenticated = false
                 }
             );
+
+            // Seed Customer
+            modelBuilder.Entity<Customer>().HasData(
+                new Customer
+                {
+                    Id = 2,
+                    EmployeeId = "em002",
+                    UserName = "alice",
+                    Password = "password",
+                    FullName = "Alice Smith",
+                    IdNumber = "ID123456789",
+                    Name = "Bob",
+                    Role = "employee",
+                    IsAuthenticated = false,
+                    AvailableBalance = 0m 
+                }
+            );
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
         }
     }
 }

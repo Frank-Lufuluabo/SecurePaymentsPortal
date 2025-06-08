@@ -5,28 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace bank_Api.Model
 {
-    public class Customer
+    public class Customer : User
     {
-        public int Id { get; set; }
-        
-        [Required]
-        public string FullName { get; set; }
+        public required string FullName { get; set; }
 
-        [Required]
-        public string AccountNumber { get; set; }
+        public required  string IdNumber { get; set; }
 
-        [Required]
-        public string IdNumber { get; set; }
-
-        public string Role { get; set; }
-
-        [Required]
-        public string UserName { get; set; }
-
-        [Required]
-        [NotMapped]
-        public string Password { get; set; }
-        public bool IsAuthenticated { get; set; }
-        public decimal AvailableBalance { get;  set; }
+        public decimal AvailableBalance { get; set; }
     }
 }
