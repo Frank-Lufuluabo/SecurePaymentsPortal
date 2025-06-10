@@ -10,24 +10,39 @@ namespace bank_Api.Controllers;
 public class CustomerController(ApplicationDbContext context) : ControllerBase
 {
     [HttpPost]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<ActionResult<Customer>> RegisterCustomer(Customer customer)
     {
-        customer.AvailableBalance = 2500m;
-        context.Customers.Add(customer);
-        await context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetCustomer), new { id = customer.Id }, customer);
+        try
+        {
+            customer.AvailableBalance = 2500m;
+            context.Customers.Add(customer);
+            await context.SaveChangesAsync();
+            return Ok(customer);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
-    [HttpGet("{id}")]
-    [Authorize]
+    [HttpGet("Details/{id}")]
+    [Authorize(Roles = "customer")]
     public async Task<ActionResult<Customer>> GetCustomer(int id)
     {
-        var customer = await context.Customers.FindAsync(id);
-        if (customer == null)
+        try
         {
-            return NotFound();
+            var customer = await context.Customers.FindAsync(id);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+            return customer;
         }
-        return customer;
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+
     }
 }

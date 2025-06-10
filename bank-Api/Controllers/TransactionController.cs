@@ -11,50 +11,93 @@ namespace bank_Api.Controllers;
 public class TransactionController(ApplicationDbContext context) : ControllerBase
 {
     [HttpPost]
-    [Authorize] //Customer ONly
+    [Authorize(Roles = "customer")]
     public async Task<ActionResult<Transaction>> CreateTransaction(Transaction transaction)
     {
-        var customer = await context.Customers.SingleAsync(x => x.Id == transaction.CustomerId);
-        customer.AvailableBalance = customer.AvailableBalance > transaction.Amount ? customer.AvailableBalance - transaction.Amount : 0;
-        context.Customers.Update(customer);
+        try
+        {
+            var customer = await context.Customers.SingleAsync(x => x.Id == transaction.CustomerId);
+            customer.AvailableBalance = customer.AvailableBalance > transaction.Amount ? customer.AvailableBalance - transaction.Amount : 0;
+            context.Customers.Update(customer);
 
-        transaction.Date = DateTime.Now;
-        context.Transactions.Add(transaction);
+            transaction.Date = DateTime.Now;
+            context.Transactions.Add(transaction);
 
-        await context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetTransactions), new { id = transaction.CustomerId }, transaction);
+            await context.SaveChangesAsync();
+            return Ok(transaction);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });            
+        }
+
     }
-
-    [HttpGet("{id}")] //Both
-    [Authorize]
-    public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions(int id)
+    
+    [HttpGet("Customer/{userId:int}")]
+    [Authorize(Roles = "customer")]
+    public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions(int userId)
     {
-        return await context.Transactions.Where(x => x.CustomerId == id).OrderByDescending(x=>x.Id).ToListAsync();
+        try
+        {
+            return await context.Transactions.Where(x => x.CustomerId == userId).OrderByDescending(x => x.Id).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
-    [HttpGet("CurrentTransaction/{id}")] //Both
-    [Authorize]
-    public async Task<ActionResult<Transaction>> GetTransaction(int id)
+    [HttpGet("Customer/Details/id={transactionId:int}&userId={userId:int}")]
+    [Authorize(Roles = "customer")]
+    public async Task<ActionResult<Transaction>> GetTransaction(int transactionId, int userId)
     {
-        return await context.Transactions.SingleAsync(x => x.Id == id);
+        try
+        {
+            return await context.Transactions.SingleAsync(x => x.Id == transactionId && x.CustomerId == userId);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
-    [HttpGet("Transactions")] //Staff only
-    [Authorize]
+    [HttpGet("Staff")]
+    [Authorize(Roles = "staff")]
     public async Task<ActionResult<IEnumerable<Transaction>>> GetStaffTransactions()
     {
-        return await context.Transactions.OrderByDescending(x => x.Id).ToListAsync();
+        try
+        {
+            return await context.Transactions.OrderByDescending(x => x.Id).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
-    [HttpGet("Verify/{id}")] //Staff only
-    [Authorize]
-    public async Task<ActionResult<Transaction>> Verify(int id)
+    [HttpGet("Staff/Details/{transactionId:int}")]
+    [Authorize(Roles = "staff")]
+    public async Task<ActionResult<Transaction>> GetStaffTransaction(int transactionId)
     {
-        var transaction = context.Transactions.Single(x => x.Id == id);
+        try
+        {
+            return await context.Transactions.SingleAsync(x => x.Id == transactionId);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("Staff/Verify")]
+    [Authorize(Roles = "staff")]
+    public async Task<ActionResult<Transaction>> Verify([FromBody] int transactionId)
+    {
+        var transaction = context.Transactions.Single(x => x.Id == transactionId);
         transaction.Verified = true;
 
         context.Update(transaction);
         await context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetStaffTransactions), new {}, transaction);
+        return CreatedAtAction(nameof(GetStaffTransactions), new { }, transaction);
     }
 }

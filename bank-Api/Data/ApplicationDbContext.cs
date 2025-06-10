@@ -40,7 +40,7 @@ namespace bank_Api.Data
                     UserName = "franck",
                     Password = "password",
                     Name = "Franck",
-                    Role = "employee",
+                    Role = "staff",
                     Email = "employee@gmail.com",
                     Position = "Bank Teller",
                     IsAuthenticated = false
@@ -58,7 +58,7 @@ namespace bank_Api.Data
                     FullName = "Alice Smith",
                     IdNumber = "ID123456789",
                     Name = "Bob",
-                    Role = "employee",
+                    Role = "customer",
                     IsAuthenticated = false,
                     AvailableBalance = 0m,
                     AccountNumber = "0123456789"

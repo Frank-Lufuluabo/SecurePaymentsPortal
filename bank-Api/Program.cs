@@ -37,11 +37,11 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-//builder.Services.AddAuthorization(options =>
-//{
-//    options.AddPolicy("RequireEmployeeRole", policy => policy.RequireRole("staff"));
-//    options.AddPolicy("RequireCustomerRole", policy => policy.RequireRole("customer"));
-//});
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireEmployeeRole", policy => policy.RequireRole("staff"));
+    options.AddPolicy("RequireCustomerRole", policy => policy.RequireRole("customer"));
+});
 
 builder.Services.AddAuthorization();
 
