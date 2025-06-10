@@ -1,4 +1,4 @@
-@bank_Api_HostAddress = http://localhost:5245
+@bank-Api_HostAddress = https://localhost:7231
 
 ### Get a customer by ID
 GET {{bank_Api_HostAddress}}/Customer/1
@@ -84,5 +84,10 @@ Content-Type: application/json
 ### Get all users
 GET {{bank_Api_HostAddress}}/User
 Accept: application/json
+
+###
+
+@id=0
+GET {{bank-Api_HostAddress}}/customer/{{id}}
 
 ###

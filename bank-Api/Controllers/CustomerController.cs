@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using bank_Api.Data;
 using bank_Api.Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace bank_Api.Controllers;
 
@@ -9,6 +10,7 @@ namespace bank_Api.Controllers;
 public class CustomerController(ApplicationDbContext context) : ControllerBase
 {
     [HttpPost]
+    [Authorize]
     public async Task<ActionResult<Customer>> RegisterCustomer(Customer customer)
     {
         customer.AvailableBalance = 2500m;
@@ -18,6 +20,7 @@ public class CustomerController(ApplicationDbContext context) : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize]
     public async Task<ActionResult<Customer>> GetCustomer(int id)
     {
         var customer = await context.Customers.FindAsync(id);

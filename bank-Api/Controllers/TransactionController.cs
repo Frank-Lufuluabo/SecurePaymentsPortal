@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using bank_Api.Data;
 using bank_Api.Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace bank_Api.Controllers;
 
@@ -10,6 +11,7 @@ namespace bank_Api.Controllers;
 public class TransactionController(ApplicationDbContext context) : ControllerBase
 {
     [HttpPost]
+    [Authorize] //Customer ONly
     public async Task<ActionResult<Transaction>> CreateTransaction(Transaction transaction)
     {
         var customer = await context.Customers.SingleAsync(x => x.Id == transaction.CustomerId);
@@ -23,25 +25,29 @@ public class TransactionController(ApplicationDbContext context) : ControllerBas
         return CreatedAtAction(nameof(GetTransactions), new { id = transaction.CustomerId }, transaction);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id}")] //Both
+    [Authorize]
     public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions(int id)
     {
         return await context.Transactions.Where(x => x.CustomerId == id).OrderByDescending(x=>x.Id).ToListAsync();
     }
 
-    [HttpGet("CurrentTransaction/{id}")]
+    [HttpGet("CurrentTransaction/{id}")] //Both
+    [Authorize]
     public async Task<ActionResult<Transaction>> GetTransaction(int id)
     {
         return await context.Transactions.SingleAsync(x => x.Id == id);
     }
 
-    [HttpGet("Transactions")]
+    [HttpGet("Transactions")] //Staff only
+    [Authorize]
     public async Task<ActionResult<IEnumerable<Transaction>>> GetStaffTransactions()
     {
         return await context.Transactions.OrderByDescending(x => x.Id).ToListAsync();
     }
 
-    [HttpGet("Verify/{id}")]
+    [HttpGet("Verify/{id}")] //Staff only
+    [Authorize]
     public async Task<ActionResult<Transaction>> Verify(int id)
     {
         var transaction = context.Transactions.Single(x => x.Id == id);

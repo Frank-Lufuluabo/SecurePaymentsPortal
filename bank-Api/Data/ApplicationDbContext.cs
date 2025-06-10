@@ -60,7 +60,8 @@ namespace bank_Api.Data
                     Name = "Bob",
                     Role = "employee",
                     IsAuthenticated = false,
-                    AvailableBalance = 0m 
+                    AvailableBalance = 0m,
+                    AccountNumber = "0123456789"
                 }
             );
         }
