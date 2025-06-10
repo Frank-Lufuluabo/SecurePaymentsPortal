@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -37,22 +38,32 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy => policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
+});
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireEmployeeRole", policy => policy.RequireRole("staff"));
     options.AddPolicy("RequireCustomerRole", policy => policy.RequireRole("customer"));
 });
 
-builder.Services.AddAuthorization();
-
 builder.Services.AddControllers();
 
-builder.Services.AddAuthorization();
-
-
 var app = builder.Build();
+
+// Use CORS before authentication/authorization
+app.UseCors("AllowFrontend");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

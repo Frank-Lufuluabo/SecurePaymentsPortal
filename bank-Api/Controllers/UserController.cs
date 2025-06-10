@@ -37,7 +37,7 @@ public class UserController(IConfiguration configuration, ApplicationDbContext c
 
             // Generate JWT token
             var token = GenerateJwtToken(user.UserName!, user.Role);
-            return Ok(new { User = user, Token = token });
+            return Ok(new { EmployeeId = user.Id, Token = token });
         }
         catch (Exception ex)
         {
@@ -47,7 +47,7 @@ public class UserController(IConfiguration configuration, ApplicationDbContext c
     }
 
     // Get Current User by EmployeeId
-    [HttpGet("current-user/{id:int}")]
+    [HttpGet("current-user/{userId:int}")]
     [Authorize(Roles = "staff")]
     public async Task<ActionResult<User>> GetCurrentUser(int userId)
     {
