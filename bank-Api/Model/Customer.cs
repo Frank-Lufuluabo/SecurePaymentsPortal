@@ -11,6 +11,9 @@ namespace bank_Api.Model
 
         public required  string IdNumber { get; set; }
 
-        public decimal AvailableBalance { get; set; }
+        public required decimal AvailableBalance { get; set; }
+
+        public required string AccountNumber { get; set; } = string.Empty;
+
     }
 }

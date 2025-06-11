@@ -27,7 +27,7 @@ public class UserController(IConfiguration configuration, ApplicationDbContext c
             }
 
             var user = await context.Users.FirstOrDefaultAsync(u => u.UserName == request.UserName);
-            if (user == null || user.Password != request.Password)
+            if (user == null || user.Password != SimpleHashHelper.Hash(request.Password))
             {
                 return Unauthorized(new { message = "Invalid Employee ID or Password." });
             }
@@ -120,7 +120,7 @@ public class UserController(IConfiguration configuration, ApplicationDbContext c
             }
 
             var customer = await context.Customers.FirstOrDefaultAsync(u => u.UserName == request.UserName && u.AccountNumber == request.AccountNumber);
-            if (customer == null || customer.Password != request.Password)
+            if (customer == null || customer.Password != SimpleHashHelper.Hash(request.Password))
             {
                 return Unauthorized(new { message = "Invalid Username, account number or Password." });
             }

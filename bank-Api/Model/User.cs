@@ -6,10 +6,7 @@ namespace bank_Api.Model
 {
     public class User : IdentityUser<int>
     {
-        [Required]
-        public string EmployeeId { get; set; } = string.Empty;
-
-        public string AccountNumber { get; set; } = string.Empty;
+        public string? EmployeeId { get; set; } = string.Empty;
 
         [Required]
         public string Password { get; set; } = string.Empty;

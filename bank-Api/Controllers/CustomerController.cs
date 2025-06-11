@@ -15,7 +15,7 @@ public class CustomerController(ApplicationDbContext context) : ControllerBase
     {
         try
         {
-            customer.AvailableBalance = 2500m;
+            customer.Password = SimpleHashHelper.Hash(customer.Password);
             context.Customers.Add(customer);
             await context.SaveChangesAsync();
             return Ok(customer);

@@ -3,6 +3,7 @@ using bank_Api.Model;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Azure.Core;
 
 namespace bank_Api.Data
 {
@@ -38,7 +39,7 @@ namespace bank_Api.Data
                     Id = 1,
                     EmployeeId = "emp001",
                     UserName = "franck",
-                    Password = "password",
+                    Password = SimpleHashHelper.Hash("password"),
                     Name = "Franck",
                     Role = "staff",
                     Email = "employee@gmail.com",
@@ -54,7 +55,7 @@ namespace bank_Api.Data
                     Id = 2,
                     EmployeeId = "em002",
                     UserName = "alice",
-                    Password = "password",
+                    Password = SimpleHashHelper.Hash("password"),
                     FullName = "Alice Smith",
                     IdNumber = "ID123456789",
                     Name = "Bob",
