@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace bank_Api.Controllers;
 
-[Authorize]
+[Authorize(Roles = "staff")]
 [ApiController]
 [Route("[controller]")]
 [Authorize(Roles = "Staff")]
@@ -15,6 +15,14 @@ public class StaffController(ApplicationDbContext context) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Staff>>> GetStaff()
     {
-        return await context.Staff.ToListAsync();
+		try
+		{
+            return await context.Staff.ToListAsync();
+
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }

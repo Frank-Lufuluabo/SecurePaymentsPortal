@@ -4,28 +4,19 @@ using bank_Api.IdentityAuth;
 
 namespace bank_Api.Model
 {
+<<<<<<< HEAD
     public class Customer : ApplicationUser
+=======
+    public class Customer : User
+>>>>>>> jwt-token
     {
-        public int Id { get; set; }
-        
-        [Required]
-        public string FullName { get; set; }
+        public required string FullName { get; set; }
 
-        [Required]
-        public string AccountNumber { get; set; }
+        public required  string IdNumber { get; set; }
 
-        [Required]
-        public string IdNumber { get; set; }
+        public required decimal AvailableBalance { get; set; }
 
-        public string Role { get; set; }
+        public required string AccountNumber { get; set; } = string.Empty;
 
-        [Required]
-        public string UserName { get; set; }
-
-        [Required]
-        [NotMapped]
-        public string Password { get; set; }
-        public bool IsAuthenticated { get; set; }
-        public decimal AvailableBalance { get;  set; }
     }
 }

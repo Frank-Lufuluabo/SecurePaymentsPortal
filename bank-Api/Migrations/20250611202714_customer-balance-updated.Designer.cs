@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using bank_Api.Data;
 
@@ -11,9 +12,11 @@ using bank_Api.Data;
 namespace bank_Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250611202714_customer-balance-updated")]
+    partial class customerbalanceupdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -341,13 +344,13 @@ namespace bank_Api.Migrations
                             Id = 2,
                             AccessFailedCount = 0,
                             AccountNumber = "0123456789",
-                            ConcurrencyStamp = "05856ae4-93ed-458e-955c-54bff1b94b2c",
+                            ConcurrencyStamp = "fc085224-b482-44ae-8abf-5912a59f6a85",
                             EmailConfirmed = false,
                             EmployeeId = "em002",
                             IsAuthenticated = false,
                             LockoutEnabled = false,
                             Name = "Bob",
-                            Password = "XohImNooBHFR0OVvjcYpJ3NgPQ1qq73WKhHvch0VQtg=",
+                            Password = "password",
                             PhoneNumberConfirmed = false,
                             Role = "customer",
                             TwoFactorEnabled = false,
@@ -374,13 +377,13 @@ namespace bank_Api.Migrations
                             Id = 1,
                             AccessFailedCount = 0,
                             AccountNumber = "",
-                            ConcurrencyStamp = "3b86c076-f04a-4aad-9578-14c914d3193f",
+                            ConcurrencyStamp = "8fb6bb40-97ad-4969-95c2-f810bf5932c6",
                             EmailConfirmed = false,
                             EmployeeId = "emp001",
                             IsAuthenticated = false,
                             LockoutEnabled = false,
                             Name = "Franck",
-                            Password = "XohImNooBHFR0OVvjcYpJ3NgPQ1qq73WKhHvch0VQtg=",
+                            Password = "password",
                             PhoneNumberConfirmed = false,
                             Role = "staff",
                             TwoFactorEnabled = false,

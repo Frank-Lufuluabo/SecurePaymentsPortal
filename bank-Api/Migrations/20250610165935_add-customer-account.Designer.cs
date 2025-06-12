@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using bank_Api.Data;
 
@@ -11,9 +12,11 @@ using bank_Api.Data;
 namespace bank_Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250610165935_add-customer-account")]
+    partial class addcustomeraccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -341,18 +344,18 @@ namespace bank_Api.Migrations
                             Id = 2,
                             AccessFailedCount = 0,
                             AccountNumber = "0123456789",
-                            ConcurrencyStamp = "05856ae4-93ed-458e-955c-54bff1b94b2c",
+                            ConcurrencyStamp = "8bf85755-fe3e-43ef-860b-323958e4a218",
                             EmailConfirmed = false,
                             EmployeeId = "em002",
                             IsAuthenticated = false,
                             LockoutEnabled = false,
                             Name = "Bob",
-                            Password = "XohImNooBHFR0OVvjcYpJ3NgPQ1qq73WKhHvch0VQtg=",
+                            Password = "password",
                             PhoneNumberConfirmed = false,
-                            Role = "customer",
+                            Role = "employee",
                             TwoFactorEnabled = false,
                             UserName = "alice",
-                            AvailableBalance = 2500m,
+                            AvailableBalance = 0m,
                             FullName = "Alice Smith",
                             IdNumber = "ID123456789"
                         });
@@ -374,15 +377,15 @@ namespace bank_Api.Migrations
                             Id = 1,
                             AccessFailedCount = 0,
                             AccountNumber = "",
-                            ConcurrencyStamp = "3b86c076-f04a-4aad-9578-14c914d3193f",
+                            ConcurrencyStamp = "14693499-9305-4049-bc7f-f4a08e83c961",
                             EmailConfirmed = false,
                             EmployeeId = "emp001",
                             IsAuthenticated = false,
                             LockoutEnabled = false,
                             Name = "Franck",
-                            Password = "XohImNooBHFR0OVvjcYpJ3NgPQ1qq73WKhHvch0VQtg=",
+                            Password = "password",
                             PhoneNumberConfirmed = false,
-                            Role = "staff",
+                            Role = "employee",
                             TwoFactorEnabled = false,
                             UserName = "franck",
                             Position = "Bank Teller"

@@ -3,18 +3,17 @@ using bank_Api.IdentityAuth;
 
 namespace bank_Api.Model
 {
+<<<<<<< HEAD
     public class Staff : ApplicationUser
     {
         public int Id { get; set; }
+=======
+    public class Staff : User
+    {      
+        public required string Position { get; set; }
+>>>>>>> jwt-token
 
-        [Required]
-        public string Name { get; set; }
-
-        [Required]
-        public string Position { get; set; }
-
-        [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public required string Email { get; set; }
     }
 }
