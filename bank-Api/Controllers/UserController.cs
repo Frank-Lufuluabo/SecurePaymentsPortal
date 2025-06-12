@@ -223,13 +223,7 @@ public class UserController(IConfiguration configuration, ApplicationDbContext c
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-<<<<<<< HEAD
-    // Get Current User by EmployeeId
-    [HttpGet("current-user/{employeeId}")]
-    public async Task<ActionResult<User>> GetCurrentUser(string employeeId)
-=======
     private async Task<bool> CheckUserIsAuth(int userId)
->>>>>>> jwt-token
     {
         var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         return (user?.IsAuthenticated).GetValueOrDefault();

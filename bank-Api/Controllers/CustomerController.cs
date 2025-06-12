@@ -7,15 +7,10 @@ namespace bank_Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Authorize(Roles = "Staff")]
 public class CustomerController(ApplicationDbContext context) : ControllerBase
 {
     [HttpPost]
-<<<<<<< HEAD
-    [Authorize(Roles = "Staff")]
-=======
     [AllowAnonymous]
->>>>>>> jwt-token
     public async Task<ActionResult<Customer>> RegisterCustomer(Customer customer)
     {
         try

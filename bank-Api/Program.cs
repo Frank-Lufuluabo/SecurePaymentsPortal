@@ -1,5 +1,4 @@
 using bank_Api.Data;
-using bank_Api.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -55,12 +54,6 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireCustomerRole", policy => policy.RequireRole("customer"));
 });
 
-<<<<<<< HEAD
-builder.Services.AddSingleton<JwtTokenService>();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-=======
->>>>>>> jwt-token
 builder.Services.AddControllers();
 
 var app = builder.Build();
